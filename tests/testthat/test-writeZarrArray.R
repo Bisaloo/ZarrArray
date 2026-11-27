@@ -118,19 +118,13 @@ test_that("ZarrRealizationSink methods", {
         }
 
         type <- "character"
-        ## Setting 'nchar' to 5 means we're not allowed to use a string
-        ## longer than 5 chars for 'fill_value' or in 'block'. Right now
-        ## Rarr::create_empty_zarr_array() and Rarr::update_zarr_array()
-        ## allow this but then the strings get silently truncated when they
-        ## land on disk. TODO: Report this.
-        nchar <- 5
         ## Setting 'fill_value' to NA_character_ is broken at the moment.
         ## See https://github.com/Huber-group-EMBL/Rarr/issues/137
         #fill_values <- list(NULL, "", ".", NA_character_)
         fill_values <- list(NULL, "", ".", " \n.")
         for (fill_value in fill_values) {
             sink <- ZarrRealizationSink(dim, type=type, chunkdim=chunkdim,
-                                        fill_value=fill_value, nchar=nchar)
+                                        fill_value=fill_value)
             if (is.null(fill_value))
                 fill_value <- vector(type, length=1L)  # effective fill value
             a <- array(fill_value, dim=dim)

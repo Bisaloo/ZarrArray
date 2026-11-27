@@ -10,8 +10,7 @@ test_that("ZarrSparseMatrixRealizationSink()", {
     ## doesn't accept "complex" or "raw" at the moment.
     ## Also we don't support 'type="character"' at the moment (see TODOs
     ## in R/writeZarrSparseMatrix.R).
-    ## TODO: Add "character" to list of types below once it's supported.
-    for (type in c("integer", "logical", "double")) {
+    for (type in c("integer", "logical", "double", "character")) {
 
         ## 0-col sink:
 

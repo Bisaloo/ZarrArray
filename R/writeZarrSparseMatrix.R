@@ -62,8 +62,6 @@ setMethod("type", "ZarrSparseMatrixRealizationSink", function(x) x@type)
 ### If 'zarr_store' is "auto" (the default), the path to the Zarr store
 ### is obtained with get_Zarr_realization_auto_path().
 ### NOTE: We don't support 'type="character"' at the moment.
-### TODO: Add 'nchar' argument and support 'type="character"' like in
-### ZarrRealizationSink().
 ### TODO: Add support for other layouts (only "tenx" is supported at
 ### the moment) and harmonize with 'sparse.layout' argument of
 ### ZarrSparseMatrixSeed().
@@ -265,8 +263,6 @@ setAs("ZarrSparseMatrixRealizationSink", "DelayedArray",
 ### If 'zarr_store' is "auto" (the default), the path to the Zarr store is
 ### obtained with get_Zarr_realization_auto_path().
 ### NOTE: We don't support 'type="character"' at the moment.
-### TODO: Add 'nchar' argument and support 'type="character"' like in
-### writeZarrArray().
 writeZarrSparseMatrix <- function(x, zarr_store="auto", group="auto",
                                      sparse.layout="auto",
                                      zarr_version="auto", verbose=NA)

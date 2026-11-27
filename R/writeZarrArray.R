@@ -64,8 +64,7 @@ setMethod("chunkdim", "ZarrRealizationSink", function(x) x@chunkdim)
 ### of Zarr v2 datasets at the moment (Rarr 1.11.24).
 ZarrRealizationSink <- function(dim, dimnames=NULL, type="double",
                                 zarr_path="auto", chunkdim="auto",
-                                fill_value=NULL, nchar=NULL,
-                                zarr_version="auto")
+                                fill_value=NULL, zarr_version="auto")
 {
     dim <- S4Arrays:::normarg_dim(dim)
     if (!is.null(dimnames))
@@ -88,7 +87,7 @@ ZarrRealizationSink <- function(dim, dimnames=NULL, type="double",
     if (isSingleString(zarr_version) && zarr_version == "auto")
         zarr_version <- get_Zarr_realization_auto_version()
     create_empty_zarr_array2(zarr_path, dim, chunkdim, type,
-                             fill_value=fill_value, nchar=nchar,
+                             fill_value=fill_value,
                              zarr_version=zarr_version)
     new2("ZarrRealizationSink", dim=dim, type=type,
                                 zarr_path=zarr_path, chunkdim=chunkdim)
@@ -144,7 +143,7 @@ setAs("ZarrRealizationSink", "DelayedArray",
 ### Does NOT write dimnames(x) to disk at the moment!
 ### TODO: writeZarrArray() needs to write the array dimnames to disk.
 ### Does the Zarr format support this?
-writeZarrArray <- function(x, zarr_path="auto", chunkdim="auto", nchar=NULL,
+writeZarrArray <- function(x, zarr_path="auto", chunkdim="auto",
                               zarr_version="auto", verbose=NA)
 {
     x_dim <- dim(x)
@@ -152,41 +151,21 @@ writeZarrArray <- function(x, zarr_path="auto", chunkdim="auto", nchar=NULL,
         stop(wmsg("'x' must be an array-like object ",
                   "(i.e. it must have dimensions)"))
     x_type <- type(x)
-    if (x_type == "character") {
-        if (is.null(nchar)) {
-            ## We use 'keepNA=TRUE' for now because we want to detect the
-            ## presence of NAs in 'x' and fail early if we find any. That's
-            ## because writing NAs to a Zarr dataset of type character is not
-            ## supported yet. See
-            ## https://github.com/Huber-group-EMBL/Rarr/issues/138
-            ## TODO: Remove 'keepNA=TRUE' once writing NAs to a Zarr dataset
-            ## of type character is supported.
-            ## +1 to add NUL terminator.
-            nchar <- compute_max_string_size(x, keepNA=TRUE) + 1L
-            has_NAs <- is.na(nchar)
-        } else {
-            has_NAs <- anyNA(x)
-        }
-        ## TODO: Get rid of this once writing NAs to a Zarr dataset
-        ## of type character is supported.
-        if (has_NAs)
-            stop(wmsg("input array has type() character and contains NAs --> ",
-                      "this is not supported yet"))
-    } else if (x_type == "logical") {
-        ## Writing NAs to a Zarr dataset of type logical is not supported yet.
+    if (x_type %in% c("logical", "character") && anyNA(x)) {
+        ## Writing NAs to a Zarr dataset of type logical or character is not
+        ## supported yet.
         ## See https://github.com/Huber-group-EMBL/Rarr/issues/138
         ## TODO: Get rid of this once writing NAs to a Zarr dataset
-        ## of type logical is supported.
-        if (anyNA(x))
-            stop(wmsg("input array has type() logical and contains NAs --> ",
-                      "this is not supported yet"))
+        ## of type logical or character is supported.
+        stop(wmsg("input array has type() ", x_type, " and contains NAs --> ",
+                    "this is not supported yet"))
     }
     verbose <- DelayedArray:::normarg_verbose(verbose)
     if (isSingleString(chunkdim) && chunkdim == "auto" || is.null(chunkdim))
         chunkdim <- chunkdim(x)
     sink <- ZarrRealizationSink(x_dim, NULL, x_type,
                                 zarr_path=zarr_path, chunkdim=chunkdim,
-                                nchar=nchar, zarr_version=zarr_version)
+                                zarr_version=zarr_version)
     sink <- BLOCK_write_to_sink(sink, x, verbose=verbose)
     as(sink, "ZarrArray")
 }

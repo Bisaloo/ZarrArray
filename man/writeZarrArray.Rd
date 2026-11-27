@@ -25,7 +25,7 @@
 }
 
 \usage{
-writeZarrArray(x, zarr_path="auto", chunkdim="auto", nchar=NULL,
+writeZarrArray(x, zarr_path="auto", chunkdim="auto"
                   zarr_version="auto", verbose=NA)
 }
 
@@ -53,13 +53,6 @@ writeZarrArray(x, zarr_path="auto", chunkdim="auto", nchar=NULL,
     The dimensions of the physical chunks to use when writing the data
     to disk. See \code{?\link{Zarr_realization_settings}} for how this is
     automatically determined when \code{chunkdim} is set to \code{"auto"}.
-  }
-  \item{nchar}{
-    When \code{x} is of type \code{character}, this argument
-    specifies the maximum length of the stored strings. By default
-    \code{writeZarrArray()} will use \code{max(nchar(x)) + 1}.
-    You can override this by supplying your own value as a single
-    positive integer but only if you know what you are doing.
   }
   \item{zarr_version}{
     \code{"auto"} or the version of the Zarr specification (i.e. 2 or 3) to
